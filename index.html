@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title></title>
+  <style>
+    html, body, video {
+      margin: 0;
+      padding: 0;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <script>
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+
+    function getVideoSources(callback) {
+      if (!navigator.mediaDevices) {
+        MediaStreamTrack.getSources(function(cameras) {
+          cameras.forEach(function(c) {
+            if (camera.kind != 'video') return;
+            callback({
+              name: camera.facing,
+              id: camera.id
+            });
+          });
+        });
+      } else {
+        navigator.mediaDevices.enumerateDevices().then(function(cameras) {
+          cameras.forEach(function(camera) {
+            if (camera.kind != 'videoinput') return;
+            callback({
+              name: camera.label,
+              id: camera.deviceId
+            });
+          });
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const button = document.querySelector('button');
+      const video = document.querySelector('video');
+      button.addEventListener('click', () => {
+        video.play();
+      });
+
+      getVideoSources((source) => {
+        if (/facing\sback/.test(source.name)) {
+          navigator.getUserMedia({
+            video: {
+              optional: [{sourceId: source.id}]
+            },
+            audio: false
+          },
+          (localMediaStream) => {
+            video.src = window.URL.createObjectURL(localMediaStream);
+          },
+          (error) => {
+            console.error(error);
+          });
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <video></video>
+  <button>start</button>
+</body>
+</html>
