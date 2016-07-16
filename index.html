@@ -44,6 +44,16 @@
     document.addEventListener('DOMContentLoaded', () => {
       const button = document.querySelector('button');
       const video = document.querySelector('video');
+      const alpha = document.getElementById('alpha'); // 方角 0 北,90 西,180 南,270 東
+      const beta = document.getElementById('beta'); // 上に水平 0, 下に水平 180, 上に垂直 90, 下に垂直 -90
+      const gamma = document.getElementById('gamma'); // 左右 0 水平, 左が負, 右が正 (max 90)
+
+      window.addEventListener('deviceorientation', (event) => {
+        alpha.innerText = event.alpha;
+        beta.innerText = event.beta;
+        gamma.innerText = event.gamma;
+      });
+
       button.addEventListener('click', () => {
         video.play();
       });
@@ -70,5 +80,8 @@
 <body>
   <video></video>
   <button>start</button>
+  <p id="alpha"></p>
+  <p id="beta"></p>
+  <p id="gamma"></p>
 </body>
 </html>
